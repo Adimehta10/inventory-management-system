@@ -6,6 +6,9 @@ function Orders() {
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
 
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
+
   const [formData, setFormData] = useState({
     customer_id: "",
     product_id: "",
@@ -78,6 +81,18 @@ function Orders() {
     }
   };
 
+  const viewOrderDetails = async (id) => {
+    try {
+      const res = await api.get(`/orders/${id}`);
+
+      setSelectedOrder(res.data);
+      setShowDetails(true);
+    } catch (error) {
+      console.error(error);
+      setMessage("Failed to load order details");
+    }
+  };
+
   const deleteOrder = async (id) => {
     if (!window.confirm("Delete this order?")) {
       return;
@@ -86,7 +101,7 @@ function Orders() {
     try {
       await api.delete(`/orders/${id}`);
 
-      setMessage("Order deleted");
+      setMessage("Order deleted successfully");
 
       loadOrders();
     } catch (error) {
@@ -110,6 +125,50 @@ function Orders() {
           }}
         >
           {message}
+        </div>
+      )}
+
+      {showDetails && selectedOrder && (
+        <div
+          style={{
+            background: "#fff",
+            padding: "20px",
+            borderRadius: "12px",
+            marginBottom: "20px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          }}
+        >
+          <h3>Order Details</h3>
+
+          <p>
+            <strong>Order ID:</strong> {selectedOrder.id}
+          </p>
+
+          <p>
+            <strong>Customer ID:</strong>{" "}
+            {selectedOrder.customer_id}
+          </p>
+
+          <p>
+            <strong>Product ID:</strong>{" "}
+            {selectedOrder.product_id}
+          </p>
+
+          <p>
+            <strong>Quantity:</strong>{" "}
+            {selectedOrder.quantity}
+          </p>
+
+          <p>
+            <strong>Total Amount:</strong> ₹
+            {selectedOrder.total_amount}
+          </p>
+
+          <button
+            onClick={() => setShowDetails(false)}
+          >
+            Close
+          </button>
         </div>
       )}
 
@@ -199,7 +258,7 @@ function Orders() {
             <th>Product ID</th>
             <th>Quantity</th>
             <th>Total Amount</th>
-            <th>Action</th>
+            <th>Actions</th>
           </tr>
         </thead>
 
@@ -213,13 +272,28 @@ function Orders() {
               <td>₹{order.total_amount}</td>
 
               <td>
-                <button
-                  onClick={() =>
-                    deleteOrder(order.id)
-                  }
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                  }}
                 >
-                  Delete
-                </button>
+                  <button
+                    onClick={() =>
+                      viewOrderDetails(order.id)
+                    }
+                  >
+                    View
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      deleteOrder(order.id)
+                    }
+                  >
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

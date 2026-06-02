@@ -59,7 +59,16 @@ def update_product(db: Session, product_id: int, product_data):
 
     product = get_product(db, product_id)
 
-    for key, value in product_data.dict(
+    if (
+        product_data.quantity is not None
+        and product_data.quantity < 0
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Quantity cannot be negative"
+        )
+
+    for key, value in product_data.model_dump(
         exclude_unset=True
     ).items():
         setattr(product, key, value)
@@ -68,29 +77,6 @@ def update_product(db: Session, product_id: int, product_data):
     db.refresh(product)
 
     return product
-
-
-def delete_product(db: Session, product_id: int):
-
-    product = get_product(db, product_id)
-
-    existing_orders = db.query(Order).filter(
-        Order.product_id == product_id
-    ).first()
-
-    if existing_orders:
-        raise HTTPException(
-            status_code=400,
-            detail="Cannot delete product with existing orders"
-        )
-
-    db.delete(product)
-    db.commit()
-
-    return {
-        "message": "Product deleted"
-    }
-
 
 # ==========================
 # CUSTOMERS
@@ -202,9 +188,7 @@ def create_order(db: Session, order):
     )
 
     db.add(db_order)
-
     db.commit()
-
     db.refresh(db_order)
 
     return db_order

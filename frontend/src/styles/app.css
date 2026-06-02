@@ -20,9 +20,14 @@ body {
   padding: 18px 30px;
 }
 
+.navbar h2 {
+  margin: 0;
+}
+
 .nav-links {
   display: flex;
   gap: 25px;
+  flex-wrap: wrap;
 }
 
 .nav-links a {
@@ -33,13 +38,13 @@ body {
 
 .container {
   padding: 30px;
+  width: 100%;
 }
 
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
-
   margin-top: 20px;
 }
 
@@ -47,8 +52,7 @@ body {
   background: white;
   padding: 25px;
   border-radius: 12px;
-
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .card p {
@@ -61,7 +65,7 @@ form {
   background: white;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 input,
@@ -69,6 +73,7 @@ select {
   padding: 12px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
+  width: 100%;
 }
 
 button {
@@ -100,4 +105,73 @@ td {
 
 th {
   background: #f8fafc;
+}
+
+/* MOBILE RESPONSIVENESS */
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .nav-links {
+    width: 100%;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  form {
+    width: 100%;
+  }
+
+  input,
+  select,
+  button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar h2 {
+    font-size: 28px;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card p {
+    font-size: 26px;
+  }
+
+  th,
+  td {
+    padding: 10px;
+  }
 }

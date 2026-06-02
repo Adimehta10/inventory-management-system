@@ -11,6 +11,8 @@ function Products() {
     quantity: "",
   });
 
+  const [editingId, setEditingId] = useState(null);
+
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -34,6 +36,17 @@ function Products() {
     });
   };
 
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      sku: "",
+      price: "",
+      quantity: "",
+    });
+
+    setEditingId(null);
+  };
+
   const addProduct = async (e) => {
     e.preventDefault();
 
@@ -47,12 +60,7 @@ function Products() {
 
       setMessage("Product added successfully");
 
-      setFormData({
-        name: "",
-        sku: "",
-        price: "",
-        quantity: "",
-      });
+      resetForm();
 
       loadProducts();
     } catch (error) {
@@ -64,6 +72,49 @@ function Products() {
         setMessage("Failed to add product");
       }
     }
+  };
+
+  const updateProduct = async (e) => {
+    e.preventDefault();
+
+    try {
+      await api.put(`/products/${editingId}`, {
+        name: formData.name,
+        sku: formData.sku,
+        price: Number(formData.price),
+        quantity: Number(formData.quantity),
+      });
+
+      setMessage("Product updated successfully");
+
+      resetForm();
+
+      loadProducts();
+    } catch (error) {
+      console.error(error);
+
+      if (error.response?.data?.detail) {
+        setMessage(error.response.data.detail);
+      } else {
+        setMessage("Failed to update product");
+      }
+    }
+  };
+
+  const startEdit = (product) => {
+    setEditingId(product.id);
+
+    setFormData({
+      name: product.name,
+      sku: product.sku,
+      price: product.price,
+      quantity: product.quantity,
+    });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const deleteProduct = async (id) => {
@@ -79,7 +130,12 @@ function Products() {
       loadProducts();
     } catch (error) {
       console.error(error);
-      setMessage("Failed to delete product");
+
+      if (error.response?.data?.detail) {
+        setMessage(error.response.data.detail);
+      } else {
+        setMessage("Failed to delete product");
+      }
     }
   };
 
@@ -102,7 +158,9 @@ function Products() {
       )}
 
       <form
-        onSubmit={addProduct}
+        onSubmit={
+          editingId ? updateProduct : addProduct
+        }
         style={{
           display: "grid",
           gap: "12px",
@@ -148,8 +206,19 @@ function Products() {
         />
 
         <button type="submit">
-          Add Product
+          {editingId
+            ? "Save Changes"
+            : "Add Product"}
         </button>
+
+        {editingId && (
+          <button
+            type="button"
+            onClick={resetForm}
+          >
+            Cancel Edit
+          </button>
+        )}
       </form>
 
       <table
@@ -166,7 +235,7 @@ function Products() {
             <th>SKU</th>
             <th>Price</th>
             <th>Quantity</th>
-            <th>Action</th>
+            <th>Actions</th>
           </tr>
         </thead>
 
@@ -179,7 +248,20 @@ function Products() {
               <td>₹{product.price}</td>
               <td>{product.quantity}</td>
 
-              <td>
+              <td
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                }}
+              >
+                <button
+                  onClick={() =>
+                    startEdit(product)
+                  }
+                >
+                  Edit
+                </button>
+
                 <button
                   onClick={() =>
                     deleteProduct(product.id)
