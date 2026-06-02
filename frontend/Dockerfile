@@ -10,6 +10,8 @@ COPY . .
 
 RUN npm run build
 
-EXPOSE 5173
+RUN npm install -g serve
 
-CMD ["npm", "run", "dev", "--", "--host"]
+EXPOSE 3000
+
+CMD sh -c "serve -s dist -l ${PORT:-3000}"
