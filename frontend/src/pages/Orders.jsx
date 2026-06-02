@@ -16,6 +16,7 @@ function Orders() {
   });
 
   const [message, setMessage] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     loadOrders();
@@ -109,10 +110,48 @@ function Orders() {
       setMessage("Failed to delete order");
     }
   };
-
+const filteredOrders = orders.filter(
+  (order) =>
+    order.customer_id
+      .toString()
+      .includes(search) ||
+    order.product_id
+      .toString()
+      .includes(search)
+);
   return (
     <div>
-      <h1>Orders</h1>
+      <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "15px",
+    marginBottom: "10px",
+    fontSize: "12px"
+  }}
+>
+  <div>
+    <h1>
+    
+      🛒 Orders
+    </h1>
+
+    <p
+      style={{
+        opacity: 0.75,
+        fontSize: "16px",
+      }}
+    >
+      Manage customer orders
+    </p>
+  </div>
+
+  <div className="page-badge">
+    Total Orders: {orders.length}
+  </div>
+</div>
 
       {message && (
         <div
@@ -120,7 +159,10 @@ function Orders() {
             marginTop: "15px",
             marginBottom: "15px",
             padding: "10px",
-            background: "#e2e8f0",
+            background:
+  "linear-gradient(135deg,#3b82f6,#8b5cf6)",
+color: "white",
+fontWeight: "600",
             borderRadius: "8px",
           }}
         >
@@ -131,7 +173,9 @@ function Orders() {
       {showDetails && selectedOrder && (
         <div
           style={{
-            background: "#fff",
+           background: "rgba(255,255,255,.25)",
+backdropFilter: "blur(18px)",
+border: "1px solid rgba(255,255,255,.2)",
             padding: "20px",
             borderRadius: "12px",
             marginBottom: "20px",
@@ -177,7 +221,9 @@ function Orders() {
         style={{
           display: "grid",
           gap: "12px",
-          maxWidth: "500px",
+          maxWidth: "700px",
+marginLeft: "auto",
+marginRight: "auto",
           marginTop: "20px",
           marginBottom: "30px",
         }}
@@ -243,14 +289,19 @@ function Orders() {
           Create Order
         </button>
       </form>
-
-      <table
-        style={{
-          width: "100%",
-          background: "white",
-          borderCollapse: "collapse",
-        }}
-      >
+<input
+  type="text"
+  placeholder="🔍 Search by Customer ID or Product ID"
+  value={search}
+  onChange={(e) =>
+    setSearch(e.target.value)
+  }
+  style={{
+    marginTop: "5px",
+    marginBottom: "8px",
+  }}
+/>
+      <table>
         <thead>
           <tr>
             <th>ID</th>
@@ -263,7 +314,7 @@ function Orders() {
         </thead>
 
         <tbody>
-          {orders.map((order) => (
+        {filteredOrders.map((order) => (
             <tr key={order.id}>
               <td>{order.id}</td>
               <td>{order.customer_id}</td>
@@ -274,16 +325,17 @@ function Orders() {
               <td>
                 <div
                   style={{
-                    display: "flex",
-                    gap: "10px",
-                  }}
+  display: "flex",
+  gap: "10px",
+  justifyContent: "center",
+}}
                 >
                   <button
                     onClick={() =>
                       viewOrderDetails(order.id)
                     }
                   >
-                    View
+                    👁 View
                   </button>
 
                   <button
@@ -291,7 +343,7 @@ function Orders() {
                       deleteOrder(order.id)
                     }
                   >
-                    Delete
+                    🗑 Delete
                   </button>
                 </div>
               </td>

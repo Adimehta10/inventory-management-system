@@ -14,6 +14,7 @@ function Products() {
   const [editingId, setEditingId] = useState(null);
 
   const [message, setMessage] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     loadProducts();
@@ -58,10 +59,9 @@ function Products() {
         quantity: Number(formData.quantity),
       });
 
-      setMessage("Product added successfully");
+      setMessage("✅ Product added successfully");
 
       resetForm();
-
       loadProducts();
     } catch (error) {
       console.error(error);
@@ -85,10 +85,9 @@ function Products() {
         quantity: Number(formData.quantity),
       });
 
-      setMessage("Product updated successfully");
+      setMessage("✅ Product updated successfully");
 
       resetForm();
-
       loadProducts();
     } catch (error) {
       console.error(error);
@@ -125,7 +124,7 @@ function Products() {
     try {
       await api.delete(`/products/${id}`);
 
-      setMessage("Product deleted successfully");
+      setMessage("🗑 Product deleted successfully");
 
       loadProducts();
     } catch (error) {
@@ -139,34 +138,66 @@ function Products() {
     }
   };
 
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      product.sku
+        .toLowerCase()
+        .includes(search.toLowerCase())
+  );
+
   return (
     <div>
-      <h1>Products</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "15px",
+          marginBottom: "10px",
+          fontSize: "12px"
+        }}
+      >
+        <div>
+          <h1>📦 Products</h1>
+
+          <p
+            style={{
+              opacity: 0.8,
+              marginTop: "2px",
+            }}
+          >
+            Manage your product inventory
+          </p>
+        </div>
+
+        <div
+          className="page-badge"
+        >
+          Total Products: {products.length}
+        </div>
+      </div>
 
       {message && (
-        <div
-          style={{
-            marginTop: "15px",
-            marginBottom: "15px",
-            padding: "10px",
-            background: "#e2e8f0",
-            borderRadius: "8px",
-          }}
-        >
+        <div className="message-box">
           {message}
         </div>
       )}
 
       <form
         onSubmit={
-          editingId ? updateProduct : addProduct
+          editingId
+            ? updateProduct
+            : addProduct
         }
         style={{
           display: "grid",
           gap: "12px",
-          marginTop: "20px",
-          marginBottom: "30px",
-          maxWidth: "500px",
+          marginBottom: "8px",
+          maxWidth: "700px",
         }}
       >
         <input
@@ -207,8 +238,8 @@ function Products() {
 
         <button type="submit">
           {editingId
-            ? "Save Changes"
-            : "Add Product"}
+            ? "💾 Save Changes"
+            : "➕ Add Product"}
         </button>
 
         {editingId && (
@@ -221,57 +252,110 @@ function Products() {
         )}
       </form>
 
-      <table
+      <input
+        type="text"
+        placeholder="🔍 Search products..."
+        value={search}
+        onChange={(e) =>
+          setSearch(e.target.value)
+        }
         style={{
-          width: "100%",
-          background: "white",
-          borderCollapse: "collapse",
-        }}
-      >
+  marginTop: "4px",
+  marginBottom: "6px",
+}}
+      />
+
+      <table>
         <thead>
           <tr>
             <th>ID</th>
-            <th>Name</th>
+            <th>Product</th>
             <th>SKU</th>
             <th>Price</th>
-            <th>Quantity</th>
-            <th>Actions</th>
+            <th>Stock</th>
+           <th style={{ textAlign: "center" }}>
+  Actions
+</th>
           </tr>
         </thead>
 
         <tbody>
-          {products.map((product) => (
-            <tr key={product.id}>
-              <td>{product.id}</td>
-              <td>{product.name}</td>
-              <td>{product.sku}</td>
-              <td>₹{product.price}</td>
-              <td>{product.quantity}</td>
+          {filteredProducts.map(
+            (product) => (
+              <tr key={product.id}>
+                <td>{product.id}</td>
 
-              <td
-                style={{
-                  display: "flex",
-                  gap: "10px",
-                }}
-              >
-                <button
-                  onClick={() =>
-                    startEdit(product)
-                  }
-                >
-                  Edit
-                </button>
+                <td>{product.name}</td>
 
-                <button
-                  onClick={() =>
-                    deleteProduct(product.id)
-                  }
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
+                <td>{product.sku}</td>
+
+                <td>
+                  ₹{product.price}
+                </td>
+
+                <td>
+                  <span
+                    style={{
+                      padding:
+                        "6px 12px",
+                      borderRadius:
+                        "999px",
+
+                      background:
+                        product.quantity <
+                        5
+                          ? "rgba(239,68,68,.15)"
+                          : "rgba(16,185,129,.15)",
+
+                      color:
+                        product.quantity <
+                        5
+                          ? "#ef4444"
+                          : "#10b981",
+
+                      fontWeight:
+                        "600",
+                    }}
+                  >
+                    {
+                      product.quantity
+                    }
+                  </span>
+                </td>
+
+                <td>
+  <div
+    style={{
+      display: "flex",
+      gap: "5px",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+                    <button
+                      onClick={() =>
+                        startEdit(
+                          product
+                        )
+                      }
+                    >
+                      ✏ Edit
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        deleteProduct(
+                          product.id
+                        )
+                      }
+                    >
+                      🗑 Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            )
+          )}
         </tbody>
       </table>
     </div>

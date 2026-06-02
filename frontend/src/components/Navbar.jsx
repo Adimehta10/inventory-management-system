@@ -1,9 +1,24 @@
 import { Link } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 
 function Navbar() {
+  const { darkMode, setDarkMode } = useTheme();
+
   return (
     <nav className="navbar">
-      <h2>Inventory System</h2>
+      <div className="logo">
+        <div className="logo-icon">⚡</div>
+
+        <div>
+          <div className="logo-title">
+            Inventory Pro
+          </div>
+
+          <div className="logo-subtitle">
+            Smart Inventory Management
+          </div>
+        </div>
+      </div>
 
       <div className="nav-links">
         <Link to="/">Dashboard</Link>
@@ -11,6 +26,17 @@ function Navbar() {
         <Link to="/customers">Customers</Link>
         <Link to="/orders">Orders</Link>
       </div>
+
+      <button
+        className="theme-btn"
+        onClick={() =>
+          setDarkMode(!darkMode)
+        }
+      >
+        {darkMode
+          ? "☀ Light"
+          : "🌙 Dark"}
+      </button>
     </nav>
   );
 }

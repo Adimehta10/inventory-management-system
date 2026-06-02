@@ -11,6 +11,7 @@ function Customers() {
   });
 
   const [message, setMessage] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     loadCustomers();
@@ -39,7 +40,7 @@ function Customers() {
     try {
       await api.post("/customers", formData);
 
-      setMessage("Customer added successfully");
+      setMessage("✅ Customer added successfully");
 
       setFormData({
         full_name: "",
@@ -67,7 +68,7 @@ function Customers() {
     try {
       await api.delete(`/customers/${id}`);
 
-      setMessage("Customer deleted successfully");
+      setMessage("🗑 Customer deleted successfully");
 
       loadCustomers();
     } catch (error) {
@@ -75,21 +76,52 @@ function Customers() {
       setMessage("Failed to delete customer");
     }
   };
+  const filteredCustomers = customers.filter(
+  (customer) =>
+    customer.full_name
+      .toLowerCase()
+      .includes(search.toLowerCase()) ||
+    customer.email
+      .toLowerCase()
+      .includes(search.toLowerCase()) ||
+    customer.phone
+      .toLowerCase()
+      .includes(search.toLowerCase())
+);
 
   return (
     <div>
-      <h1>Customers</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "15px",
+          marginBottom: "25px",
+          fontSize: "12px"
+        }}
+      >
+        <div>
+          <h1>👥 Customers</h1>
+
+          <p
+            style={{
+              opacity: 0.8,
+              marginTop: "8px",
+            }}
+          >
+            Manage customer information
+          </p>
+        </div>
+
+        <div className="page-badge">
+          Total Customers: {customers.length}
+        </div>
+      </div>
 
       {message && (
-        <div
-          style={{
-            marginTop: "15px",
-            marginBottom: "15px",
-            padding: "10px",
-            background: "#e2e8f0",
-            borderRadius: "8px",
-          }}
-        >
+        <div className="message-box">
           {message}
         </div>
       )}
@@ -99,9 +131,7 @@ function Customers() {
         style={{
           display: "grid",
           gap: "12px",
-          marginTop: "20px",
-          marginBottom: "30px",
-          maxWidth: "500px",
+          maxWidth: "700px",
         }}
       >
         <input
@@ -132,17 +162,22 @@ function Customers() {
         />
 
         <button type="submit">
-          Add Customer
+          ➕ Add Customer
         </button>
       </form>
-
-      <table
-        style={{
-          width: "100%",
-          background: "white",
-          borderCollapse: "collapse",
-        }}
-      >
+<input
+  type="text"
+  placeholder="🔍 Search customers..."
+  value={search}
+  onChange={(e) =>
+    setSearch(e.target.value)
+  }
+  style={{
+    marginTop: "4px",
+    marginBottom: "8px",
+  }}
+/>
+      <table>
         <thead>
           <tr>
             <th>ID</th>
@@ -154,11 +189,14 @@ function Customers() {
         </thead>
 
         <tbody>
-          {customers.map((customer) => (
+          {filteredCustomers.map((customer) => (
             <tr key={customer.id}>
               <td>{customer.id}</td>
+
               <td>{customer.full_name}</td>
+
               <td>{customer.email}</td>
+
               <td>{customer.phone}</td>
 
               <td>
@@ -167,7 +205,7 @@ function Customers() {
                     deleteCustomer(customer.id)
                   }
                 >
-                  Delete
+                  🗑 Delete
                 </button>
               </td>
             </tr>
